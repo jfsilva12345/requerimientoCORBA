@@ -7,6 +7,8 @@ import org.omg.CORBA.*;
 import s_gestion_usuarios.sop_corba.*;
 import cliente.Utilidades.*;
 import java.rmi.RemoteException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class ClienteDeObjetos {
@@ -42,10 +44,10 @@ public class ClienteDeObjetos {
             href1 = AdmCllbckIntHelper.narrow(ref1);
 
             // *** Resuelve la referencia del objeto en el N_S ***
-            String name = "objUsuarios";
-            refPersonal = GestionPersonalIntHelper.narrow(ncRef.resolve_str(name));
 
-            refUsuario = GestionUsuariosIntHelper.narrow(ncRef.resolve_str(name));
+            refPersonal = GestionPersonalIntHelper.narrow(ncRef.resolve_str("objPersonal"));
+
+            refUsuario = GestionUsuariosIntHelper.narrow(ncRef.resolve_str("objUsuarios"));
 
             System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refPersonal);
                         
@@ -216,11 +218,11 @@ public class ClienteDeObjetos {
             switch(opcionSecre)
             {
                 case 1:
-                        System.out.println("por implementar");
+                        Opcion1Secre();
                         break;
                 case 2:
-                        System.out.println("por implementar");
-                        break;	
+                        Opcion2Secre();
+                        break;		
                 case 3:
                         System.out.println("Salir...");
                         break;
@@ -467,4 +469,129 @@ public class ClienteDeObjetos {
         }	
     }
 
+
+    private static void Opcion1Secre(){
+        System.out.println("==Registro del Usuario==");
+        boolean bandera=false;
+        int opcionTI = 0;
+        String varDepenFac="";
+        String varTipoUsuario="";
+        String varFechaIngreso="";
+
+        System.out.println("Ingrese el nombre completo ");
+        String varNombres = UtilidadesConsola.leerCadena();
+
+
+//#region numero id
+        System.out.println("Ingrese el numero de identificacion");
+        int varId = UtilidadesConsola.leerEntero();
+        if (varId < 0){
+            bandera = true;
+        }
+
+//#endregion
+
+//#region dependenci
+
+        System.out.println("==DEPENDENCIA/FACULTAD==");
+        System.out.println("1. Dependencias");			
+        System.out.println("2. Facultad");
+
+        opcionTI = UtilidadesConsola.leerEntero();
+
+        if(opcionTI==1){
+            varDepenFac="Dependencias";
+        }else if(opcionTI==2){
+            varDepenFac="Facultad";
+        }else {
+            bandera=true;
+        }
+
+//#endregion
+
+//#region TIPO USER
+
+        System.out.println("==DEPENDENCIA/FACULTAD==");
+        System.out.println("1. ADMINISTRATIVOS");			
+        System.out.println("2. DOCENTES");
+
+        opcionTI = UtilidadesConsola.leerEntero();
+
+        if(opcionTI==1){
+            varTipoUsuario="ADMINISTRATIVOS";
+        }else if(opcionTI==2){
+            varTipoUsuario="DOCENTES";
+        }else {
+            bandera=true;
+        }
+
+//#endregion
+        
+//#region date
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm");
+        varFechaIngreso = dtf.format(LocalDateTime.now());
+
+//#endregion
+
+//#region patologia
+
+        System.out.println("Ingrese la patologia ");
+        String varPatologia = UtilidadesConsola.leerCadena();
+//#endregion
+
+//#region user
+        System.out.println("Ingrese el usuario ");
+        String varUsuario = UtilidadesConsola.leerCadena();
+
+        if (varUsuario.length()<8){
+            bandera=true;
+        }
+//#endregion
+
+//#region contra
+        System.out.println("Ingrese la contraseña ");
+        String varClave = UtilidadesConsola.leerCadena();
+
+        if (varClave.length()<8){
+            bandera=true;
+        }
+//#endregion
+        if(!bandera){
+
+            UsuarioDTO objUsuario= new UsuarioDTO(varNombres, varId, varDepenFac,varTipoUsuario,varFechaIngreso,varPatologia, varUsuario,varClave);
+
+            boolean valor = refUsuario.registrarUsuario(objUsuario);
+            if(valor)
+                    System.out.println("Registro realizado satisfactoriamente...");
+            else
+                    System.out.println("no se pudo realizar el registro...");
+
+        }else{
+            System.out.println("datos erroneos");
+        }
+    }
+
+    private static void Opcion2Secre(){	
+        int id = -1;
+        System.out.println("========================");
+        System.out.println("==Consulta de usuarios==");
+        System.out.println("========================");
+
+        System.out.println("Digite el id del usuario a buscar");
+
+        id = UtilidadesConsola.leerEntero();
+        UsuarioDTOHolder usuarioHolder  = new UsuarioDTOHolder();
+        boolean valor = true;
+        valor  = refUsuario.consultarUsuario(id, usuarioHolder);
+
+        if (valor){
+            System.out.println(usuarioHolder.value.nombreCompleto);
+            System.out.println(usuarioHolder.value.id);
+            System.out.println(usuarioHolder.value.dependencia);
+            System.out.println(usuarioHolder.value.tipoUsuario);
+            System.out.println(usuarioHolder.value.fechaIngreso);
+            System.out.println(usuarioHolder.value.usuario);
+        }	
+    }
 }
