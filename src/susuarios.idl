@@ -1,0 +1,76 @@
+module sop_corba{
+
+    struct AsistenciaDTO{
+        long id;
+        string fechaAsistencia;
+        string observacion;
+    };
+
+    struct EjercicioDTO{
+        string nombre;
+        long repeticiones;
+        double pese; 
+    };
+
+    struct ValoracionDTO{
+        long id;
+        string fechaValoracion;
+        double frecuenciaCardiacaReposo;
+        double frecuenciaCardiacaActiva;
+        double estattura;
+        double brazo;
+        double pierna;
+        double pecho;
+        double cintura;
+    };
+
+    struct UsuarioDTO{
+        string nombreCompleto;
+        long id;
+        string dependencia;
+        string tipoUsuario;
+        string fechaIngreso;
+        string patologia;
+        string usuario;
+        string clave;
+        boolean valorado;
+    };
+
+    typedef sequence<EjercicioDTO> arrayEjercicioDTO;
+
+    struct KeyValEjDTO{
+        string key;
+        arrayEjercicioDTO value;
+    };
+    typedef sequence<KeyValEjDTO> HashMapEjDTO;
+
+    struct ProgramaSemanaDTO{
+        long id;
+        HashMapEjDTO plan;
+    };
+
+    struct KeyValPrSmDTO{
+        string key;
+        ProgramaSemanaDTO value;
+    };
+    typedef sequence<KeyValPrSmDTO> HashMapPrSmDTO;
+
+    typedef sequence<AsistenciaDTO> arrayAsistenciaDTO;
+
+  
+    interface GestionAsistenciaInt{
+        long registrarAsistencia(in AsistenciaDTO objAsistencia);
+
+        arrayAsistenciaDTO consultarAsistenciasUsuario(in long id);
+    };
+
+    interface GestionProgramaFisicoUsuarioInt{
+        void registrarPlanFisico(in UsuarioDTO objUsuario, in HashMapPrSmDTO planFisicoCompleto);
+
+        HashMapPrSmDTO consultarProgramaCompleto(in long id);
+
+        void registrarValoracion(in UsuarioDTO objUsuario, in ValoracionDTO objValoracion);
+        
+        ValoracionDTO consultarValoracion(in long objUsuario);
+    };
+ };
